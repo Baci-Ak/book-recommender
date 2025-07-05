@@ -1,4 +1,14 @@
 
+---
+title: Semantic Book Recommender
+emoji: 📚
+colorFrom: indigo
+colorTo: purple
+sdk: gradio
+sdk_version: 4.29.0
+app_file: App.py
+pinned: false
+---
 
 
 # Book Recommender System — LLM-Powered Semantic Discovery
