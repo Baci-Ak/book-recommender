@@ -1,5 +1,6 @@
 
 
+
 # ========== Imports & Environment Setup ==========
 import os
 import numpy as np
@@ -79,7 +80,8 @@ def recommend_books(query: str, category: str, tone: str):
         truncated_description = " ".join(desc_words[:30]) + "..."
 
         # Format authors nicely
-        authors_split = row['authors'].split(';')
+        authors = row['authors'] if pd.notnull(row['authors']) else "Unknown"
+        authors_split = authors.split(';')
         if len(authors_split) == 2:
             authors_str = f"{authors_split[0]} and {authors_split[1]}"
         elif len(authors_split) > 2:

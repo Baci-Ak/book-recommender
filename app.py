@@ -6,8 +6,7 @@ import pandas as pd
 import gradio as gr
 
 from dotenv import load_dotenv
-from langchain_community.document_loaders import TextLoader
-from langchain_text_splitters import CharacterTextSplitter
+
 from langchain_openai import OpenAIEmbeddings
 from langchain_chroma import Chroma
 
@@ -16,10 +15,10 @@ load_dotenv()
 
 
 
-# Auto-build vector store if not already present
-if not os.path.exists("chroma_store"):
-    print("Vector store not found. Building it now...")
-    import build_vector_store  # Runs the build script at runtime
+# ========== Load API Key from Hugging Face Secrets ==========
+openai_api_key = os.environ.get("OPENAI_API_KEY")
+if not openai_api_key:
+    raise ValueError("OPENAI_API_KEY not found in environment variables.")
 
 
 # ========== Load & Prepare Book Dataset ==========
@@ -32,7 +31,7 @@ books['large_thumbnail'] = np.where(books['large_thumbnail'].isna(), 'no_cover.j
 # ==========  Load Vector Database for Semantic Search ==========
 
 
-embedding_model = OpenAIEmbeddings()
+embedding_model = OpenAIEmbeddings(openai_api_key=openai_api_key)
 db_books = Chroma(persist_directory="chroma_store", embedding_function=embedding_model)
 
 
@@ -81,7 +80,8 @@ def recommend_books(query: str, category: str, tone: str):
         truncated_description = " ".join(desc_words[:30]) + "..."
 
         # Format authors nicely
-        authors_split = row['authors'].split(';')
+        authors = row['authors'] if pd.notnull(row['authors']) else "Unknown"
+        authors_split = authors.split(';')
         if len(authors_split) == 2:
             authors_str = f"{authors_split[0]} and {authors_split[1]}"
         elif len(authors_split) > 2:

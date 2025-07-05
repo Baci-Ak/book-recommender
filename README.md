@@ -5,23 +5,30 @@ emoji: 📚
 colorFrom: indigo
 colorTo: purple
 sdk: gradio
-sdk_version: 4.29.0
-app_file: App.py
+sdk_version: 5.35.0
+app_file: app.py
 pinned: false
 ---
 
-
 # Book Recommender System — LLM-Powered Semantic Discovery
 
-A production-grade, **LLM-based book recommendation system** that uses deep language understanding, vector similarity, and emotional insight to deliver **deeply personalized and explainable** book suggestions.
+A **book recommendation system** that uses LLM, OpenAI Embeddings, and langchain to deliver **personalized and explainable** book recommendation to target users.
 
-Unlike traditional recommender systems that rely on ratings or collaborative filtering, this system leverages rich book metadata (e.g., descriptions), **OpenAI embeddings**, **LLM-powered classification**, and **emotion detection** to intelligently match, classify, and recommend books.
+Unlike traditional recommender systems that rely on ratings or collaborative filtering, this system leverages book metadata (descriptions), **OpenAI embeddings**, **LLM-powered classification**, and **emotion detection** to intelligently match, classify, and recommend books to target users.
+
 
 ---
 
+## Business Context and Problem
+
+With the ever-growing online content and the ubiquity of Internet-enabled devices, users are facing information overload. This overload leads to difficulties in making decisions on what content or products to consume or purchase. The project focuses on helping an online book selling company that has been experiencing declining sales due to the overwhelming choices and challenges customers face when selecting books to buy.
+
+The company's management recognizes the need for an intelligent recommendation engine to assist users in finding books aligned with their emotions, meaning, and interest. This engine will not only enhance sales by providing personalized recommendations but also improve customer satisfaction by simplifying the decision-making process.
+
+---
 ## Project Objective
 
-To build a fully explainable, **language-first book discovery engine** that:
+To build a fully explainable, **language book recommender engine** that:
 
 * Recommends books from **natural language queries** (e.g., *“Books about space exploration for children”*)
 * Embeds book descriptions into vector space using **OpenAI Embeddings**
@@ -32,20 +39,26 @@ To build a fully explainable, **language-first book discovery engine** that:
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 book-recommender/
-├── data-exploration.ipynb         # Data cleaning, wrangling, EDA
-├── vector-search.ipynb            # Embeddings, vector store, semantic search
-├── text-classification.ipynb      # Zero-shot LLM genre classification
-├── sentiment-analysis.ipynb       # Emotion analysis using Hugging Face model
-├── gradio-dashboard.py            # Interactive book recommender UI (Gradio)
-├── tagged_descriptions.txt        # Text used for embedding (ISBN + description)
-├── books_cleaned.csv              # Cleaned dataset post EDA
-├── books_with_categories.csv      # Genre-classified dataset
-├── books_with_emotions.csv        # Final enriched dataset (genre + emotions)
-└── .env                           # Secure environment variables (API keys)
+├── app.py # Main app for Hugging Face deployment
+├── gradio-dasboard-main.py # Older version (local dev)
+├── build_vector_store.py # One-time script to build Chroma vector DB
+├── chroma_store/ # Vector DB folder (auto-created)
+│ └── ...
+├── tagged_descriptions.txt # ISBN + descriptions for embedding
+├── no_cover.jpg # Placeholder image
+├── requirements.txt # Project dependencies
+├── README.md # doc
+├── books_cleaned.csv # Cleaned metadata
+├── books_with_categories.csv # Genre-classified dataset
+├── books_with_emotions.csv # Final enriched dataset (used in app)
+├── data-exploration.ipynb # EDA, cleaning
+├── vector-search.ipynb # Embeddings + Chroma indexing
+├── text-classification.ipynb # Zero-shot genre classification
+└── sentiment-analysis.ipynb # Emotion tagging using Hugging Face
 ```
 
 ---
@@ -93,8 +106,8 @@ retrieve_semantic_recommendation("Books about nature for children")
 * Used [`facebook/bart-large-mnli`](https://huggingface.co/facebook/bart-large-mnli) with zero-shot classification
 * Performance on validation set:
 
-  * ✅ Accuracy: **77.8%**
-  * ✅ F1 Scores: 0.75 (Fiction), 0.80 (Nonfiction)
+  *  Accuracy: **77.8%**
+  * F1 Scores: 0.75 (Fiction), 0.80 (Nonfiction)
 * Classified remaining uncategorized books
 * Output saved as `books_with_categories.csv`
 
@@ -131,6 +144,7 @@ retrieve_semantic_recommendation("Books about nature for children")
   * Short description preview
 * Ready for deployment (next step)
 
+[ Live App >>](https://huggingface.co/spaces/BaciAkom/semantic-book-recommend)
 ---
 
 ## 🛠️ Tech Stack
@@ -146,33 +160,43 @@ retrieve_semantic_recommendation("Books about nature for children")
 
 ---
 
-## 🚧 What’s Next?
+## Run Locally?
 
-🚀 **Coming up:**
+---
+```
+# 1. Clone repo
+git clone https://github.com/Baci-Ak/book-recommender.git
+cd book-recommender
 
-* [x] Build Gradio dashboard for semantic recommendations
-* [ ] 💻 **Deploy on Hugging Face Spaces** (free hosting for Gradio apps)
-* [ ] 🧪 Evaluate recommender performance (e.g. NDCG, human evals)
-* [ ] 🌐 Add public search/share features (e.g., public book URLs)
-* [ ] 🎨 Design upgrade — improve UX/UI for visual appeal and mobile responsiveness
-* [ ] 📊 Add explainability: show why each book was recommended (embedding similarity, emotional tone)
+# 2. Set API key
+echo "OPENAI_API_KEY=your-key" > .env
+
+# 3. Install deps
+pip install -r requirements.txt
+
+# 4. Launch app
+python app.py
+```
+---
+
+
+
+
+## Status & Roadmap
+
+* [x] Semantic search via OpenAI embeddings
+* [x] Genre classification via zero-shot LLM
+* [x] Emotion filtering with transformer models
+* [x] Gradio dashboard (v1)
+* [x] Deployment to Hugging Face Spaces
+* [x] Public result sharing
 
 ---
 
 ## 🧑‍💻 Contributing & License
-
-This is a personal data science project exploring LLMs, vector search, and recommender systems.
 
 * 📜 Dataset: [Kaggle Book Metadata](https://www.kaggle.com/datasets/dylanjcastillo/7k-books-with-metadata)
 * 🤗 Models: Available via [Hugging Face](https://huggingface.co/)
 * 🛠️ Open to suggestions and pull requests
 
 ---
-
-Let me know when you're ready and I’ll help you:
-
-* Clean and optimize your codebase
-* Create `requirements.txt`, `README.md`, `app.py` for Hugging Face Spaces
-* Add `.gitattributes` and secrets config
-
-Ready when you are 🚀
