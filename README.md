@@ -1,25 +1,24 @@
-Here is the updated **world-class `README.md`** for your project, including the new **Sentiment Analysis** stage. This documentation is fully structured, professional, and follows industry best practices:
 
 ---
 
-# 📚 Book Recommender System — LLM-Powered Semantic Discovery
+# Book Recommender System — LLM-Powered Semantic Discovery
 
-A production-grade, **LLM-based book recommendation system** that uses deep language understanding and vector similarity search to deliver highly relevant and personalized book suggestions.
+A production-grade, **LLM-based book recommendation system** that uses deep language understanding, vector similarity, and emotional insight to deliver **deeply personalized and explainable** book suggestions.
 
-Unlike traditional recommender systems that rely on user ratings or collaborative filtering, this system leverages rich textual metadata (e.g. descriptions), **OpenAI embeddings**, and **LLM-powered classification** to perform intelligent book matching, classification, and emotional analysis.
+Unlike traditional recommender systems that rely on ratings or collaborative filtering, this system leverages rich book metadata (e.g., descriptions), **OpenAI embeddings**, **LLM-powered classification**, and **emotion detection** to intelligently match, classify, and recommend books.
 
 ---
 
-## 🎯 Project Objective
+## Project Objective
 
-To build a fully explainable, **language-first book recommendation engine** that:
+To build a fully explainable, **language-first book discovery engine** that:
 
-* Recommends books from natural language queries (e.g. *“Books about space exploration for children”*)
-* Embeds book descriptions into a vector space using **OpenAI Embeddings**
-* Retrieves semantically similar content using **Chroma vector search**
-* Classifies books into **Fiction**, **Nonfiction**, or **Children’s** categories using **zero-shot LLM classification**
-* Analyzes the **emotional tone** of each book using a **fine-tuned emotion classifier**
-* Lays the foundation for **filterable, emotion-aware, personalized recommendations**
+* Recommends books from **natural language queries** (e.g., *“Books about space exploration for children”*)
+* Embeds book descriptions into vector space using **OpenAI Embeddings**
+* Retrieves semantically similar books using **Chroma vector database**
+* Classifies books as **Fiction**, **Nonfiction**, or **Children’s** using **zero-shot LLM classification**
+* Analyzes the **emotional tone** of each book using a **fine-tuned emotion detection model**
+* Powers an interactive **Gradio dashboard** for genre-, tone-, and meaning-based exploration
 
 ---
 
@@ -27,81 +26,100 @@ To build a fully explainable, **language-first book recommendation engine** that
 
 ```
 book-recommender/
-├── data-exploration.ipynb         # Data cleaning, wrangling, and EDA
-├── vector-search.ipynb            # Embeddings, vector store, semantic queries
-├── text-classification.ipynb      # Zero-shot LLM-based genre classification
-├── sentiment-analysis.ipynb       # Emotion classification using fine-tuned model
-├── books_cleaned.csv              # Dataset after filtering and preprocessing
-├── books_with_categories.csv      # Dataset after genre classification
-├── books_with_emotions.csv        # Final dataset with emotion scores
-└── .env                           # API keys (e.g. OpenAI) and environment vars
+├── data-exploration.ipynb         # Data cleaning, wrangling, EDA
+├── vector-search.ipynb            # Embeddings, vector store, semantic search
+├── text-classification.ipynb      # Zero-shot LLM genre classification
+├── sentiment-analysis.ipynb       # Emotion analysis using Hugging Face model
+├── gradio-dashboard.py            # Interactive book recommender UI (Gradio)
+├── tagged_descriptions.txt        # Text used for embedding (ISBN + description)
+├── books_cleaned.csv              # Cleaned dataset post EDA
+├── books_with_categories.csv      # Genre-classified dataset
+├── books_with_emotions.csv        # Final enriched dataset (genre + emotions)
+└── .env                           # Secure environment variables (API keys)
 ```
 
 ---
 
-## ✅ Project Progress
+## Project Progress
 
-### 📊 1. Data Cleaning & Exploration [`data-exploration.ipynb`](./data-exploration.ipynb)
+### 1. Data Cleaning & Exploration [`data-exploration.ipynb`](./data-exploration.ipynb)
 
 * Loaded the [7K Books with Metadata](https://www.kaggle.com/datasets/dylanjcastillo/7k-books-with-metadata) dataset from Kaggle
-* Cleaned and filtered:
+* Filtered books with:
 
-  * Removed rows missing critical metadata
-  * Kept books with **25+ word descriptions**
-  * Combined `title` and `subtitle` intelligently
+  * Complete descriptions (≥25 words)
+  * Valid authors and titles
+* Merged title and subtitle
 * Engineered features:
 
-  * `tagged_description` = `isbn13 + description`
-  * `title_and_subtitle`, `age_of_book`, etc.
-* Saved cleaned data as `books_cleaned.csv`
+  * `title_and_subtitle`, `age_of_book`, `tagged_description` (used for vector indexing)
+* Output saved as `books_cleaned.csv`
 
 ---
 
 ### 🔍 2. Semantic Embedding & Vector Search [`vector-search.ipynb`](./vector-search.ipynb)
 
-* Embedded descriptions using OpenAI's [`text-embedding-ada-002`](https://platform.openai.com/docs/guides/embeddings)
-* Split text into chunks using `CharacterTextSplitter`
-* Stored vectors using **ChromaDB**
-* Implemented semantic recommendation:
+* Embedded book descriptions using OpenAI's [`text-embedding-ada-002`](https://platform.openai.com/docs/guides/embeddings)
+* Split text into chunks using LangChain's `CharacterTextSplitter`
+* Stored embeddings in **ChromaDB**
+* Enabled vector-based semantic retrieval:
 
-  ```
-  retrieve_semantic_recommendation("A book to teach children about nature")
-  ```
-* Mapped recommendations back to metadata via `isbn13`
+```
+retrieve_semantic_recommendation("Books about nature for children")
+```
+
+* Mapped retrieved vectors to book metadata using `isbn13`
 
 ---
 
-### 🧠 3. LLM-Based Genre Classification [`text-classification.ipynb`](./text-classification.ipynb)
+### 🧠 3. Genre Classification via Zero-Shot LLM [`text-classification.ipynb`](./text-classification.ipynb)
 
-* Original `categories` field had **479 messy labels**
-* Consolidated into 3 clean classes:
+* Original dataset had **479+ inconsistent categories**
+* Reduced to 3 major genres:
 
   * `Fiction`
   * `Nonfiction`
   * `Children's Nonfiction`
-* Used `facebook/bart-large-mnli` for **zero-shot classification** via Hugging Face
-* Evaluated on 600 samples (300 per class):
+* Used [`facebook/bart-large-mnli`](https://huggingface.co/facebook/bart-large-mnli) with zero-shot classification
+* Performance on validation set:
 
-  * **Accuracy**: 77.8%
-  * **F1 Score**: 0.75 (Fiction), 0.80 (Nonfiction)
-* Applied model to classify books with missing categories
-* Saved as `books_with_categories.csv`
+  * ✅ Accuracy: **77.8%**
+  * ✅ F1 Scores: 0.75 (Fiction), 0.80 (Nonfiction)
+* Classified remaining uncategorized books
+* Output saved as `books_with_categories.csv`
 
 ---
 
-### ❤️ 4. Emotion Classification with Fine-Tuned LLM [`sentiment-analysis.ipynb`](./sentiment-analysis.ipynb)
+### ❤️ 4. Emotion Detection for Tone Filtering [`sentiment-analysis.ipynb`](./sentiment-analysis.ipynb)
 
-* Used `j-hartmann/emotion-english-distilroberta-base` fine-tuned model from [Hugging Face](https://huggingface.co/j-hartmann/emotion-english-distilroberta-base)
-* Targeted **7 emotions**:
+* Used [`j-hartmann/emotion-english-distilroberta-base`](https://huggingface.co/j-hartmann/emotion-english-distilroberta-base) — a fine-tuned transformer model
+* Target emotions:
 
   * `joy`, `sadness`, `fear`, `anger`, `disgust`, `surprise`, `neutral`
 * Strategy:
 
-  * Split each book description into sentences
-  * Applied classifier per sentence
-  * Aggregated scores using **max pooling**
-* Merged predicted emotion scores with original book metadata
+  * Split each description into sentences
+  * Run classifier on each sentence
+  * Aggregate scores using **max pooling**
+* Merged scores with original dataset
 * Final dataset saved as `books_with_emotions.csv`
+
+---
+
+### 🖼️ 5. Interactive Book Recommender Dashboard [`gradio-dashboard.py`](./gradio-dashboard.py)
+
+* Built a user-friendly, responsive dashboard using **Gradio**
+* Allows users to:
+
+  * Search books by natural language query
+  * Filter by **genre** (Fiction, Nonfiction, etc.)
+  * Filter by **emotional tone** (Happy, Sad, Suspenseful, etc.)
+* Results include:
+
+  * Book cover
+  * Title + author
+  * Short description preview
+* Ready for deployment (next step)
 
 ---
 
@@ -111,32 +129,40 @@ book-recommender/
 | --------------- | ----------------------------------------------------------------------------------------------------------------------- |
 | Language Models | OpenAI Embeddings (`text-embedding-ada-002`), `facebook/bart-large-mnli`                                                |
 | Emotion Model   | [`j-hartmann/emotion-english-distilroberta-base`](https://huggingface.co/j-hartmann/emotion-english-distilroberta-base) |
-| Frameworks      | LangChain, Hugging Face Transformers                                                                                    |
-| Vector Storage  | ChromaDB (in-memory vector database)                                                                                    |
-| Dev Environment | Jupyter via PyCharm, macOS M1 with MPS acceleration                                                                     |
-| Tooling         | pandas, tqdm, numpy, matplotlib, seaborn, scikit-learn, dotenv                                                          |
+| Frameworks      | LangChain, Hugging Face Transformers, Gradio                                                                            |
+| Vector Storage  | ChromaDB (in-memory)                                                                                                    |
+| Notebook Dev    | Jupyter (via PyCharm)                                                                                                   |
+| Tooling         | pandas, tqdm, numpy, matplotlib, seaborn, dotenv, scikit-learn                                                          |
 
 ---
 
 ## 🚧 What’s Next?
 
-The next stages in the roadmap:
+🚀 **Coming up:**
 
-* 🖼️ Build interactive UI with **Gradio**
-* 🎛️ Add **filters** based on genre or emotion
-* 🔌 Deploy as API (FastAPI / LangServe)
-* 🧪 Conduct evaluation and user studies
-* 🔎 Explainability via embeddings visualization
-
----
-
-## 🤝 Contributing & License
-
-This is a personal project exploring the fusion of NLP and recommender systems. Contributions, ideas, or issue reports are welcome.
-
-* 🧠 Model Licensing: All models used are publicly available on [Hugging Face](https://huggingface.co/)
-* 📜 Dataset License: [Kaggle Book Metadata Dataset](https://www.kaggle.com/datasets/dylanjcastillo/7k-books-with-metadata)
+* [x] Build Gradio dashboard for semantic recommendations
+* [ ] 💻 **Deploy on Hugging Face Spaces** (free hosting for Gradio apps)
+* [ ] 🧪 Evaluate recommender performance (e.g. NDCG, human evals)
+* [ ] 🌐 Add public search/share features (e.g., public book URLs)
+* [ ] 🎨 Design upgrade — improve UX/UI for visual appeal and mobile responsiveness
+* [ ] 📊 Add explainability: show why each book was recommended (embedding similarity, emotional tone)
 
 ---
 
+## 🧑‍💻 Contributing & License
 
+This is a personal data science project exploring LLMs, vector search, and recommender systems.
+
+* 📜 Dataset: [Kaggle Book Metadata](https://www.kaggle.com/datasets/dylanjcastillo/7k-books-with-metadata)
+* 🤗 Models: Available via [Hugging Face](https://huggingface.co/)
+* 🛠️ Open to suggestions and pull requests
+
+---
+
+Let me know when you're ready and I’ll help you:
+
+* Clean and optimize your codebase
+* Create `requirements.txt`, `README.md`, `app.py` for Hugging Face Spaces
+* Add `.gitattributes` and secrets config
+
+Ready when you are 🚀
