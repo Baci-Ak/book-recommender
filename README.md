@@ -1,115 +1,142 @@
----
+Here is the updated **world-class `README.md`** for your project, including the new **Sentiment Analysis** stage. This documentation is fully structured, professional, and follows industry best practices:
 
+---
 
 # 📚 Book Recommender System — LLM-Powered Semantic Discovery
 
 A production-grade, **LLM-based book recommendation system** that uses deep language understanding and vector similarity search to deliver highly relevant and personalized book suggestions.
 
-Unlike traditional recommender systems that rely on user ratings or collaborative filtering, this system leverages rich textual metadata (e.g. descriptions) and **OpenAI embeddings** to perform intelligent matching and classification of books based on **semantic meaning**.
+Unlike traditional recommender systems that rely on user ratings or collaborative filtering, this system leverages rich textual metadata (e.g. descriptions), **OpenAI embeddings**, and **LLM-powered classification** to perform intelligent book matching, classification, and emotional analysis.
 
 ---
 
 ## 🎯 Project Objective
 
-To build a **fully explainable, language-first book recommendation engine** that:
+To build a fully explainable, **language-first book recommendation engine** that:
 
-- Recommends books based on natural language queries (e.g. *“Books about space exploration for children”*)
-- Embeds book metadata into a vector space using LLM embeddings
-- Enables semantic search through vector similarity (using `Chroma`)
-- Classifies books by **Fiction vs Nonfiction** using **zero-shot LLM classification**
-- Lays the foundation for **filterable, personalized discovery**
+* Recommends books from natural language queries (e.g. *“Books about space exploration for children”*)
+* Embeds book descriptions into a vector space using **OpenAI Embeddings**
+* Retrieves semantically similar content using **Chroma vector search**
+* Classifies books into **Fiction**, **Nonfiction**, or **Children’s** categories using **zero-shot LLM classification**
+* Analyzes the **emotional tone** of each book using a **fine-tuned emotion classifier**
+* Lays the foundation for **filterable, emotion-aware, personalized recommendations**
 
 ---
 
 ## 📁 Project Structure
 
 ```
-
 book-recommender/
-├── data-exploration.ipynb       # End-to-end data cleaning, EDA, wrangling
-├── vector-search.ipynb          # Embedding, vector store, semantic querying
-├── text-classification.ipynb    # LLM-based category classification (fiction/nonfiction)
-├── books_cleaned.csv            # Cleaned metadata used for embeddings
-├── books_with_categories.csv    # Final dataset with category classification
-└── .env                         # Environment variables (e.g. OpenAI API key)
-
-````
+├── data-exploration.ipynb         # Data cleaning, wrangling, and EDA
+├── vector-search.ipynb            # Embeddings, vector store, semantic queries
+├── text-classification.ipynb      # Zero-shot LLM-based genre classification
+├── sentiment-analysis.ipynb       # Emotion classification using fine-tuned model
+├── books_cleaned.csv              # Dataset after filtering and preprocessing
+├── books_with_categories.csv      # Dataset after genre classification
+├── books_with_emotions.csv        # Final dataset with emotion scores
+└── .env                           # API keys (e.g. OpenAI) and environment vars
+```
 
 ---
 
 ## ✅ Project Progress
 
-### 📊 1. Data Cleaning & Exploration (`data-exploration.ipynb`)
-- ✅ Loaded the **7K Books with Metadata** dataset from Kaggle [Kaggle: 7K Books with Metadata](https://www.kaggle.com/datasets/dylanjcastillo/7k-books-with-metadata)
-- ✅ Conducted **EDA** to identify and handle missing values
-- ✅ Created `tagged_description` (ISBN + description) for indexing
-- ✅ Filtered books with at least **25+ words** in the description
-- ✅ Merged subtitle with title when available
-- ✅ Engineered fields like:
-  - `title_and_subtitle`
-  - `tagged_description`
-  - `age_of_book`
-- ✅ Saved cleaned dataset to `books_cleaned.csv`
+### 📊 1. Data Cleaning & Exploration [`data-exploration.ipynb`](./data-exploration.ipynb)
+
+* Loaded the [7K Books with Metadata](https://www.kaggle.com/datasets/dylanjcastillo/7k-books-with-metadata) dataset from Kaggle
+* Cleaned and filtered:
+
+  * Removed rows missing critical metadata
+  * Kept books with **25+ word descriptions**
+  * Combined `title` and `subtitle` intelligently
+* Engineered features:
+
+  * `tagged_description` = `isbn13 + description`
+  * `title_and_subtitle`, `age_of_book`, etc.
+* Saved cleaned data as `books_cleaned.csv`
 
 ---
 
-### 🔎 2. Semantic Embedding & Vector Search (`vector-search.ipynb`)
-- ✅ Extracted book descriptions for embedding
-- ✅ Chunked long text using `CharacterTextSplitter`
-- ✅ Used **OpenAI's Embeddings API** via `langchain` to convert books into vector space
-- ✅ Stored vectorized data in **ChromaDB** for fast retrieval
-- ✅ Implemented semantic query interface:
+### 🔍 2. Semantic Embedding & Vector Search [`vector-search.ipynb`](./vector-search.ipynb)
 
-```
-  retrieve_semantic_recommendation("A book about nature for kids")
-````
+* Embedded descriptions using OpenAI's [`text-embedding-ada-002`](https://platform.openai.com/docs/guides/embeddings)
+* Split text into chunks using `CharacterTextSplitter`
+* Stored vectors using **ChromaDB**
+* Implemented semantic recommendation:
 
-✅ Created utility function to fetch metadata based on `isbn13`
+  ```
+  retrieve_semantic_recommendation("A book to teach children about nature")
+  ```
+* Mapped recommendations back to metadata via `isbn13`
 
 ---
 
-### 🧠 3. LLM-Based Text Classification (`text-classification.ipynb`)
+### 🧠 3. LLM-Based Genre Classification [`text-classification.ipynb`](./text-classification.ipynb)
 
-* ✅ Cleaned and simplified `categories` field (originally 470+ messy values)
-* ✅ Created `simple_categories` with values: `Fiction`, `Nonfiction`, and `Children's`
-* ✅ Used `facebook/bart-large-mnli` via HuggingFace to perform **zero-shot classification**
-* ✅ Evaluated performance:
+* Original `categories` field had **479 messy labels**
+* Consolidated into 3 clean classes:
+
+  * `Fiction`
+  * `Nonfiction`
+  * `Children's Nonfiction`
+* Used `facebook/bart-large-mnli` for **zero-shot classification** via Hugging Face
+* Evaluated on 600 samples (300 per class):
 
   * **Accuracy**: 77.8%
-  * **F1 Scores**: `0.75` (Fiction), `0.80` (Nonfiction)
-* ✅ Applied predictions to books with missing categories
-* ✅ Saved updated dataset as `books_with_categories.csv`
+  * **F1 Score**: 0.75 (Fiction), 0.80 (Nonfiction)
+* Applied model to classify books with missing categories
+* Saved as `books_with_categories.csv`
+
+---
+
+### ❤️ 4. Emotion Classification with Fine-Tuned LLM [`sentiment-analysis.ipynb`](./sentiment-analysis.ipynb)
+
+* Used `j-hartmann/emotion-english-distilroberta-base` fine-tuned model from [Hugging Face](https://huggingface.co/j-hartmann/emotion-english-distilroberta-base)
+* Targeted **7 emotions**:
+
+  * `joy`, `sadness`, `fear`, `anger`, `disgust`, `surprise`, `neutral`
+* Strategy:
+
+  * Split each book description into sentences
+  * Applied classifier per sentence
+  * Aggregated scores using **max pooling**
+* Merged predicted emotion scores with original book metadata
+* Final dataset saved as `books_with_emotions.csv`
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Component      | Technology                                       |
-| -------------- | ------------------------------------------------ |
-| Language Model | OpenAI Embeddings (`text-embedding-ada-002`)     |
-| Frameworks     | LangChain, Hugging Face Transformers             |
-| Data Storage   | ChromaDB (in-memory vector store)                |
-| Notebook Dev   | Jupyter (inside PyCharm)                         |
-| Libraries      | pandas, matplotlib, seaborn, transformers, numpy |
-| Environment    | `.venv`, `.env`, macOS M1 (MPS acceleration)     |
+| Component       | Technology                                                                                                              |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Language Models | OpenAI Embeddings (`text-embedding-ada-002`), `facebook/bart-large-mnli`                                                |
+| Emotion Model   | [`j-hartmann/emotion-english-distilroberta-base`](https://huggingface.co/j-hartmann/emotion-english-distilroberta-base) |
+| Frameworks      | LangChain, Hugging Face Transformers                                                                                    |
+| Vector Storage  | ChromaDB (in-memory vector database)                                                                                    |
+| Dev Environment | Jupyter via PyCharm, macOS M1 with MPS acceleration                                                                     |
+| Tooling         | pandas, tqdm, numpy, matplotlib, seaborn, scikit-learn, dotenv                                                          |
 
 ---
 
-## 🚧 What's Next?
+## 🚧 What’s Next?
 
-Coming up in the next stages:
+The next stages in the roadmap:
 
-* 📈 **Sentiment Analysis** on book descriptions
-* 🎛️ **Category-based filtering** in recommendations
-* 🖼️ Web UI / Streamlit frontend
-* 🔌 API deployment (FastAPI or LangServe)
-* 🧪 Evaluation using user study / embeddings comparison
+* 🖼️ Build interactive UI with **Gradio**
+* 🎛️ Add **filters** based on genre or emotion
+* 🔌 Deploy as API (FastAPI / LangServe)
+* 🧪 Conduct evaluation and user studies
+* 🔎 Explainability via embeddings visualization
 
 ---
 
 ## 🤝 Contributing & License
 
-This is a personal project. Contributions and suggestions are welcome as the project evolves into a more robust recommender platform.
+This is a personal project exploring the fusion of NLP and recommender systems. Contributions, ideas, or issue reports are welcome.
+
+* 🧠 Model Licensing: All models used are publicly available on [Hugging Face](https://huggingface.co/)
+* 📜 Dataset License: [Kaggle Book Metadata Dataset](https://www.kaggle.com/datasets/dylanjcastillo/7k-books-with-metadata)
 
 ---
+
 
