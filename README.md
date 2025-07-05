@@ -136,7 +136,7 @@ retrieve_semantic_recommendation("Books about nature for children")
   * Short description preview
 * Ready for deployment (next step)
 
-[ Live App >>](https://baciakom-semantic-book-recommender.hf.space/)
+### 🌐 [Launch the Live App>>](https://baciakom-semantic-book-recommender.hf.space/)
 ---
 
 ## 🛠️ Tech Stack
