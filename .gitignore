@@ -13,3 +13,6 @@ __pycache__/
 
 # Ignore environment variable files
 .env
+chroma_store/
+.DS_Store/
+.DS_Store

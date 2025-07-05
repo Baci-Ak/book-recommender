@@ -14,6 +14,14 @@ from langchain_chroma import Chroma
 # Load environment variables (e.g., OpenAI API key)
 load_dotenv()
 
+
+
+# Auto-build vector store if not already present
+if not os.path.exists("chroma_store"):
+    print("Vector store not found. Building it now...")
+    import build_vector_store  # Runs the build script at runtime
+
+
 # ========== Load & Prepare Book Dataset ==========
 books = pd.read_csv('books_with_emotions.csv')
 
