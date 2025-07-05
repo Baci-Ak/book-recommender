@@ -1,0 +1,10 @@
+gradio
+pandas
+numpy
+langchain
+openai
+tqdm
+python-dotenv
+langchain-community
+langchain-openai
+langchain-chroma

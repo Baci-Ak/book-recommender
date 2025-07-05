@@ -1,6 +1,5 @@
 
-
-# ========== 🧱 Imports & Environment Setup ==========
+# ========== Imports & Environment Setup ==========
 import os
 import numpy as np
 import pandas as pd
@@ -23,24 +22,19 @@ books["large_thumbnail"] = books["thumbnail"] + "&fife=w800"
 books['large_thumbnail'] = np.where(books['large_thumbnail'].isna(), 'no_cover.jpg', books['large_thumbnail'])
 
 # ==========  Load Vector Database for Semantic Search ==========
-# Load preprocessed tagged descriptions used for embeddings
-raw_documents = TextLoader("tagged_descriptions.txt").load()
 
-# Split long text into chunks
-text_splitter = CharacterTextSplitter(chunk_size=300, chunk_overlap=0, separator="\n")
-documents = text_splitter.split_documents(raw_documents)
 
-# Convert text into OpenAI embeddings and store in Chroma vector database
 embedding_model = OpenAIEmbeddings()
-db_books = Chroma.from_documents(documents, embedding=embedding_model)
+db_books = Chroma(persist_directory="chroma_store", embedding_function=embedding_model)
 
-# ========== 🔎 Semantic Retrieval Logic ==========
+
+# ========== Semantic Retrieval Logic ==========
 def retrieve_semantic_recommendations(
     query: str,
     category: str = None,
     tone: str = None,
     initial_top_k: int = 50,
-    final_top_k: int = 16
+    final_top_k: int = 24
 ) -> pd.DataFrame:
     # Search top-N semantically similar books
     recs = db_books.similarity_search(query, k=initial_top_k)
@@ -68,7 +62,7 @@ def retrieve_semantic_recommendations(
 
     return book_recs
 
-# ========== 🖼️ Frontend Book Formatter ==========
+# ========== Frontend Book Formatter ==========
 def recommend_books(query: str, category: str, tone: str):
     recommendations = retrieve_semantic_recommendations(query, category, tone)
     results = []
@@ -93,14 +87,14 @@ def recommend_books(query: str, category: str, tone: str):
 
     return results
 
-# ========== 🎛️ Gradio UI ==========
+# ========== Gradio UI ==========
 # Dropdown choices
 categories = ['All'] + sorted(books["simple_categories"].dropna().unique())
 tones = ['All', 'Happy', 'Surprising', 'Angry', 'Suspenseful', 'Sad']
 
 # Define Gradio Blocks Interface
 with gr.Blocks(theme=gr.themes.Glass()) as dashboard:
-    gr.Markdown("# Semantic Book Recommendation System")
+    gr.HTML("<h1 style='font-size: 48px; color: #5A189A; text-align: center;'>Semantic Book Recommendation System</h1>")
     gr.Markdown("Enter your query and get LLM-powered book suggestions based on meaning, tone, and genre.")
 
     with gr.Row():
@@ -110,11 +104,19 @@ with gr.Blocks(theme=gr.themes.Glass()) as dashboard:
         submit_button = gr.Button("Find Recommendations")
 
     gr.Markdown("## Recommendations")
-    output = gr.Gallery(label="Recommended Books", columns=8, rows=2)
+    output = gr.Gallery(label="Recommended Books", columns=8, rows=3)
+
+    gr.HTML("""
+        <div style='text-align: center; margin-top: 60px;'>
+            <p style='font-size: 18px; color: #444;'><strong>Bassey Akom</strong></p>
+            <p style='font-size: 16px; color: #666;'>Data Scientist / Mathematician</p>
+            <a href='https://www.linkedin.com/in/basseyakom/' target='_blank' style='color: #5A189A; font-weight: bold;'>Connect on LinkedIn</a>
+        </div>
+    """)
 
     # Connect button to function
     submit_button.click(fn= recommend_books, inputs=[user_query, category_dropdown, tone_dropdown], outputs=output)
 
-# ========== 🚀 Launch ==========
+# Launch
 if __name__ == '__main__':
     dashboard.launch()
