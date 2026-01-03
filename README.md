@@ -2,7 +2,7 @@
 ![Untitled design (1)](https://github.com/user-attachments/assets/e386bd71-bfc5-467a-9653-00ebbe394e28)
 ---
 
-# Book Recommender System — LLM-Powered Semantic Discovery
+# Book Recommender System - LLM-Powered Semantic Discovery
 
 A **book recommendation system** that uses LLM, OpenAI Embeddings, and langchain to deliver **personalized and explainable** book recommendation to target users.
 
